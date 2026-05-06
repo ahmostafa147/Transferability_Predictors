@@ -182,3 +182,6 @@ To **force recomputation** of a given piece:
 - delete files in `results/figures/` → regenerates plots on next `run.py` / `plots.py`
 
 `run.py` only skips a scratch run if **both** the saved weights and the cached accuracy entry exist, so you never end up with a missing model for a supposedly cached run.
+
+
+Note: LLM-assisted in optimizing code for GPU usage.
