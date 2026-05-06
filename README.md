@@ -184,4 +184,4 @@ To **force recomputation** of a given piece:
 `run.py` only skips a scratch run if **both** the saved weights and the cached accuracy entry exist, so you never end up with a missing model for a supposedly cached run.
 
 
-Note: LLM-assisted in optimizing code for GPU usage.
+Note: LLM-assisted in optimizing code for GPU usage and for debugging.
