@@ -6,11 +6,11 @@ import numpy as np
 import torch
 
 from data import get_loader, num_classes
-from extract import cached_features
-from align import pca_subspace, alignment_score, principal_angles, rv_coefficient, h_score
+from extract import cached_features, imagenet_probs
+from align import pca_subspace, alignment_score, principal_angles, rv_coefficient, h_score, leep_score
 from probe import linear_probe
 from scratch import train_from_scratch
-from plots import (scatter_alignment_vs_gap, principal_angle_spectra,
+from plots import (scatter_metric_vs_gap, principal_angle_spectra,
                    accuracy_bars, variance_explained, sensitivity_to_k,
                    metric_comparison_grid)
 
@@ -69,6 +69,10 @@ def main():
         rv = rv_coefficient(F_tr, F_ref)
         h = h_score(F_tr, y_tr)
 
+        print(f"[{name}] computing LEEP")
+        theta = imagenet_probs(F_tr)
+        leep = leep_score(theta, y_tr)
+
         print(f"[{name}] sensitivity sweep over k={K_SWEEP}")
         for k in K_SWEEP:
             Uk = pca_subspace(F_tr, k)
@@ -96,6 +100,7 @@ def main():
             "alignment_score": score,
             "rv_score": rv,
             "h_score": h,
+            "leep_score": leep,
             "probe_acc": probe_acc,
             "scratch_acc": scratch_acc,
             "transfer_gap": probe_acc - scratch_acc,
@@ -115,7 +120,7 @@ def main():
     gaps = [r["transfer_gap"] for r in rows]
 
     print("[plots] generating figures")
-    scatter_alignment_vs_gap(scores, gaps, names)
+    scatter_metric_vs_gap(scores, gaps, names)
     principal_angle_spectra(angle_spectra)
     accuracy_bars(probe_accs, scratch_accs, names)
     variance_explained(feat_for_var)

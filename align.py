@@ -44,3 +44,17 @@ def h_score(F, y):
     Mc = means - mu
     cov_g = (Mc * p[:, None]).T @ Mc
     return float(np.trace(np.linalg.pinv(cov_f) @ cov_g))
+
+
+# LEEP (Nguyen et al., ICML 2020). LLM-assisted for writing vectorization.
+def leep_score(theta, y):
+    n, Z = theta.shape
+    y = np.asarray(y).flatten()
+    Y = int(y.max()) + 1
+    joint = np.zeros((Y, Z), dtype=np.float64)
+    np.add.at(joint, y, theta)
+    joint /= n
+    p_z = joint.sum(0, keepdims=True)
+    cond = joint / np.maximum(p_z, 1e-12)
+    p_yi = (theta * cond[y]).sum(1)
+    return float(np.log(np.maximum(p_yi, 1e-12)).mean())

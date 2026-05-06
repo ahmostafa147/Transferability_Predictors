@@ -6,7 +6,8 @@ from scipy.stats import pearsonr, spearmanr
 os.makedirs("results/figures", exist_ok=True)
 
 
-def scatter_alignment_vs_gap(scores, gaps, names, path="results/figures/alignment_vs_gap.png"):
+def scatter_metric_vs_gap(scores, gaps, names, xlabel="PCA alignment score",
+                           path="results/figures/alignment_vs_gap.png"):
     scores = np.asarray(scores)
     gaps = np.asarray(gaps)
     r, p = pearsonr(scores, gaps)
@@ -17,9 +18,9 @@ def scatter_alignment_vs_gap(scores, gaps, names, path="results/figures/alignmen
     m, b = np.polyfit(scores, gaps, 1)
     xs = np.linspace(scores.min(), scores.max(), 100)
     ax.plot(xs, m * xs + b, "r--", alpha=0.7)
-    ax.set_xlabel("PCA alignment score")
+    ax.set_xlabel(xlabel)
     ax.set_ylabel("Transfer gap (probe - scratch)")
-    ax.set_title(f"Alignment vs transfer gap (r={r:.2f}, p={p:.3f})")
+    ax.set_title(f"{xlabel} vs transfer gap (r={r:.2f}, p={p:.3f})")
     fig.tight_layout()
     fig.savefig(path, dpi=150)
     plt.close(fig)
@@ -87,11 +88,12 @@ def sensitivity_to_k(scores_by_k, gaps, k_values, path="results/figures/sensitiv
 def metric_comparison_grid(rows, path="results/figures/metric_comparison.png", leave_out=None):
     metrics = [("alignment_score", "PCA alignment"),
                ("rv_score", "RV coefficient"),
-               ("h_score", "H-score")]
+               ("h_score", "H-score"),
+               ("leep_score", "LEEP")]
     targets = [("probe_acc", "Probe accuracy"),
                ("transfer_gap", "Transfer gap")]
     names = [r["dataset"] for r in rows]
-    fig, axes = plt.subplots(len(targets), len(metrics), figsize=(15, 9))
+    fig, axes = plt.subplots(len(targets), len(metrics), figsize=(20, 9))
     summary = {}
     for i, (tkey, tlabel) in enumerate(targets):
         y = np.array([r[tkey] for r in rows])

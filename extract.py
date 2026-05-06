@@ -40,6 +40,12 @@ def extract_features(loader):
     return F, y
 
 
+def imagenet_probs(F):
+    fc = models.resnet18(weights="IMAGENET1K_V1").fc
+    with torch.no_grad():
+        return torch.softmax(fc(torch.from_numpy(F).float()), dim=1).numpy()
+
+
 def cached_features(name, split, batch_size=512):
     path = f"{FEAT_DIR}/{name}_{split}.npz"
     if os.path.exists(path):
